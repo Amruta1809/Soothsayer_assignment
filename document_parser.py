@@ -1,14 +1,14 @@
 import pdfplumber
 import pandas as pd
 
+import fitz  # PyMuPDF
+
 def parse_pdf(file):
     text = ""
-    tables = []
-    with pdfplumber.open(file) as pdf:
-        for page in pdf.pages:
-            text += page.extract_text() or ""
-            tables.extend(page.extract_tables())
-    return text, tables
+    with fitz.open(stream=file.read(), filetype="pdf") as doc:
+        for page in doc:
+            text += page.get_text()
+    return text, []
 
 def parse_excel(file):
     dataframes = pd.read_excel(file, sheet_name=None)  # Read all sheets
@@ -30,3 +30,4 @@ def extract_financial_metrics(text, tables):
             metrics[kw] = snippet
     
     return metrics
+
